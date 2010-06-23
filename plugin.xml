@@ -1,0 +1,21 @@
+<plugin name='extjs-scaffolding' version='0.2-SNAPSHOT' grailsVersion='1.2.1 &gt; *'>
+  <author>Nabil ADOUANI</author>
+  <authorEmail>nabil.adouani@gmail.com</authorEmail>
+  <title>ExtJS based views scaffolding</title>
+  <description>\
+This plugin allows user to scaffold ExtJS GUI instead of standard scaffolded views.
+</description>
+  <documentation>http://grails.org/plugin/extjs-scaffolding</documentation>
+  <resources>
+    <resource>BuildConfig</resource>
+    <resource>DataSource</resource>
+    <resource>UrlMappings</resource>
+    <resource>fr.nadouani.grails.plugins.extjsscaffold.ExtJsTagLib</resource>
+  </resources>
+  <dependencies>
+    <resolvers>
+      <resolver type='grailsPlugins' name='grailsPlugins' />
+    </resolvers>
+  </dependencies>
+  <behavior />
+</plugin>

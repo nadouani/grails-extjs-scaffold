@@ -1,0 +1,207 @@
+<% import grails.persistence.Event %>
+<% import org.codehaus.groovy.grails.scaffolding.DomainClassPropertyComparator %>
+
+<%  
+	if (property.type == Boolean.class || property.type == boolean.class)
+		out << renderBooleanEditor(domainClass, property)
+	else if (Number.class.isAssignableFrom(property.type) || (property.type.isPrimitive() && property.type != boolean.class))
+		out << renderNumberEditor(domainClass, property)
+	else if (property.type == String.class || property.type == URL.class)
+		out << renderStringEditor(domainClass, property)
+	else if (property.type == Date.class || property.type == java.sql.Date.class || property.type == java.sql.Time.class || property.type == Calendar.class)
+		out << renderDateEditor(domainClass, property)
+	else if (property.manyToOne || property.oneToOne)
+		out << renderManyToOne(domainClass, property)
+	else if ((property.oneToMany && !property.bidirectional) || (property.manyToMany && property.isOwningSide()))
+		out << renderManyToMany(domainClass, property)
+	else if (property.oneToMany)
+		out << renderOneToMany(domainClass, property)
+	else	
+		out << renderTextFieldEditor(domainClass, property)
+
+    private renderTextFieldEditor(domainClass, property) {
+        return "{xtype: 'textfield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', anchor: '100%'}, "
+    }
+
+	// Render boolean field's input
+	private renderBooleanEditor(domainClass, property) {
+		return "{xtype: 'checkbox', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />'}, "
+	}
+	
+	// Render number field's input
+	private renderNumberEditor(domainClass, property) {
+		if (!cp) {
+			if (property.type == Byte.class) {
+				return "{xtype: 'numberfield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', decimalPrecision:0, maxValue:127, minValue:-128}, "
+			}
+			else {
+				return "{xtype: 'numberfield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />'}, "
+			}
+		}
+		else {
+			if (cp.range) {
+				return "{xtype: 'spinnerfield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', decimalPrecision:0, maxValue:${cp.range.to}, minValue:${cp.range.from}}, "
+			}
+			else if (cp.inList) {
+				return """{\
+					xtype:'combo',
+					store: \${${domainInstance}.constraints.${property.name}.inList},
+					name: '${property.name}',
+					fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',
+					triggerAction:'all',
+					emptyText:'Select a <g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />...',
+					selectOnFocus:true
+				},"""
+			}            
+			else {
+				return "{xtype: 'numberfield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />'}, "
+			}
+		}
+	}
+
+	// Render number field's input
+	private renderStringEditor(domainClass, property) {
+		if (!cp) {
+			return "{xtype: 'textfield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />'}, "
+		}
+		else {
+			if ("textarea" == cp.widget || (cp.maxSize > 250 && !cp.password && !cp.inList)) {
+				return "{xtype: 'textarea', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />'}, "
+			}
+			else {
+				if (cp.inList) {
+					def sb = new StringBuffer()
+					sb << "{xtype:'combo', "
+					sb << "store:<extjsUtils:stringArray data=\"\${${domainInstance}.constraints.${property.name}.inList}\"/>, "
+					sb << "name:'${property.name}', "
+					sb << "fieldLabel:'<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', "
+					sb << "triggerAction:'all', "
+					sb << "emptyText:'Select a <g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />...', "
+					sb << "selectOnFocus:true"
+					sb << "}, "
+					return sb.toString()
+				} else if(cp.widget && cp.widget == "htmlEditor"){
+					return "{xtype:'htmleditor', name:'${property.name}', fieldLabel:'<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', height:200,anchor:'98%'}, "
+				}else {
+					def sb = new StringBuffer("{xtype: 'textfield', name: '${property.name}', ")
+					sb << "fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', "
+					
+					if (cp.password) sb << "inputType: 'password', "
+					if (cp.maxSize) sb << "maxLength: '${cp.maxSize}', "
+					if (!cp.editable) sb << "readonly: true, "
+					if (cp.email) sb << "vtype: 'email', "
+					if (cp.url) sb << "vtype: 'url', "
+					
+					sb << "}, "
+					return sb.toString()
+				}
+			}
+		}
+	}
+	
+	private renderDateEditor(domainClass, property) {
+		if (!cp) {
+			return "{xtype: 'datefield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />'}, "
+		}
+		else {
+			def sb = new StringBuffer("{xtype: 'datefield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', ")
+			
+			if (!cp.editable) sb << "readOnly: true, "
+			
+			sb << "}, "
+			return sb.toString()
+		}
+	}
+
+	private renderManyToOne(domainClass, property){
+		if (property.association) {
+			// TODO : show correct fields
+			def sb = new StringBuffer();
+			
+			sb << "{"
+			sb << "\nxtype:'combo',"
+			sb << "\nstore: new Ext.data.JsonStore({"
+			sb << "\n\turl: '<g:resource dir=\"${property.referencedDomainClass.propertyName}\" file=\"list\" />',"
+			sb << "\n\tremoteSort: true,"
+			sb << "\n\tautoLoad:true,"
+			sb << "\n\troot: 'data',"
+			sb << "\n\ttotalProperty: 'totalCount',"
+			sb << "\n\tidProperty: 'id',"
+			sb << "\n\tfields: ["
+			
+			// Render the store fields
+			def excludedProps = Event.allEvents.toList() << 'version'
+			def props = property.referencedDomainClass.properties.findAll { !excludedProps.contains(it.name) && !it.isAssociation()}		
+			Collections.sort(props, DomainClassPropertyComparator.class.constructors[0].newInstance([property.referencedDomainClass] as Object[]))
+			
+			props.each { p -> 
+				def cp = property.referencedDomainClass.constrainedProperties[p.name]
+				def display = (cp ? cp.display : true)        
+				if (display) { 
+					sb << "'${p.name}',"      	
+				}
+			}
+			
+			sb << "]"
+			sb << "\n}),"			
+			sb << "\nname: '${property.name}.id',"
+			sb << "\nfieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
+			sb << "\nvalueField:'id',"
+			sb << "\nhiddenName:'${property.name}.id',"
+			sb << "\ndisplayField:'nom',"
+			sb << "\nmode: 'remote',"
+			sb << "\ntriggerAction:'all',"
+			sb << "\nforceSelection:true,"
+			sb << "\nenableKeyEvents:true,"
+			sb << "\npageSize:10,"
+			sb << "\nresizable:true,"
+			sb << "\nemptyText:'Select a ${property.type.name}...',"
+			sb << "\nselectOnFocus:true"
+			sb << "\n},"
+			
+			return sb.toString()
+		}
+	}
+	
+	private renderManyToMany(domainClass, property){
+		return "{value:'renderManyToMany', xtype: 'textfield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', anchor: '100%'}, "
+	}
+	
+	private renderOneToMany(domainClass, property){
+		// TODO : show correct store fields and grid columns
+		def sb = new StringBuffer();
+		
+		sb << "{"
+		sb << "\ntitle:'<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
+		sb << "\nxtype: 'grid',"
+		sb << "\nlayout: 'fit',"
+		sb << "\nborder:false,"
+		sb << "\nid: 'grid${domainClass.shortName}${property.referencedDomainClass.shortName}',"
+		sb << "\nstore: new ${domainClass.shortName}${property.referencedDomainClass.shortName}Store(),"
+		sb << "\ncolumns:["		
+		
+		// loop on properties
+		//{header: '<g:message code="animal.id.label" default="Id" />', dataIndex: 'id', width: 50, sortable: true},      
+		def excludedProps = Event.allEvents.toList() << 'version'
+		def props = property.referencedDomainClass.properties.findAll { !excludedProps.contains(it.name) && !it.isAssociation()}		
+    	Collections.sort(props, DomainClassPropertyComparator.class.constructors[0].newInstance([property.referencedDomainClass] as Object[]))
+    	
+    	props.each { p -> 
+        	def cp = property.referencedDomainClass.constrainedProperties[p.name]
+            def display = (cp ? cp.display : true)        
+            if (display) { 
+            	sb << "\n\t{header: '<g:message code=\"${property.referencedDomainClass.propertyName}.${p.name}.label\" default=\"${p.naturalName}\" />', dataIndex: '${p.name}', width: 50, sortable: true},"      	
+        	}
+        }
+		
+		sb << "\n],"
+		sb << "\nviewConfig: {forceFit:true,enableRowBody:true,emptyText: 'No data to display'},"
+		sb << "\ntbar: ["
+		sb << "\n\t{text: '<g:message code=\"default.button.new.label\" default=\"New\" /> ${property.referencedDomainClass.shortName}',iconCls: 'icon-add'},"
+		sb << "\n\t{text: '<g:message code=\"default.button.delete.label\" default=\"Delete\" /> ${property.referencedDomainClass.shortName}',iconCls: 'icon-delete'}"
+		sb << "\n]},"
+		
+		return sb.toString()
+	}
+
+%>
