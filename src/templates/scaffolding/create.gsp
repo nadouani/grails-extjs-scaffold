@@ -97,7 +97,7 @@ ${className}Form = Ext.extend(Ext.form.FormPanel, {
     },
     
     onRender:function() {
-		PersonneForm.superclass.onRender.apply(this, arguments);
+		${className}Form.superclass.onRender.apply(this, arguments);
 		this.getForm().waitMsgTarget = this.getEl();
 		
 		if(this.actionName == 'edit'){

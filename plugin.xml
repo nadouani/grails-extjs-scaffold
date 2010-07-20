@@ -1,4 +1,4 @@
-<plugin name='extjs-scaffolding' version='0.3' grailsVersion='1.2.1 &gt; *'>
+<plugin name='extjs-scaffolding' version='0.2-SNAPSHOT' grailsVersion='1.2.1 &gt; *'>
   <author>Nabil ADOUANI</author>
   <authorEmail>nabil.adouani@gmail.com</authorEmail>
   <title>ExtJS based views scaffolding</title>
