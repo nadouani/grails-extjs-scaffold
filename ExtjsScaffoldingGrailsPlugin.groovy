@@ -1,3 +1,8 @@
+import fr.nadouani.extjsscaffold.marshallers.DomainClassMarshallerWithToString
+import grails.converters.JSON
+import org.codehaus.groovy.grails.web.converters.configuration.ConvertersConfigurationHolder
+import org.codehaus.groovy.grails.web.converters.configuration.DefaultConverterConfiguration
+
 class ExtjsScaffoldingGrailsPlugin {
     // the plugin version
     def version = "0.2-SNAPSHOT"
@@ -35,6 +40,9 @@ This plugin allows user to scaffold ExtJS GUI instead of standard scaffolded vie
 
     def doWithApplicationContext = { applicationContext ->
         // TODO Implement post initialization spring config (optional)
+		DefaultConverterConfiguration<JSON> configDCMWithToString = new DefaultConverterConfiguration<JSON>(ConvertersConfigurationHolder.getConverterConfiguration(JSON.class));
+		configDCMWithToString.registerObjectMarshaller(new DomainClassMarshallerWithToString(false), 100);
+		ConvertersConfigurationHolder.setNamedConverterConfiguration(JSON.class, "dcmWithToString", configDCMWithToString);
     }
 
     def onChange = { event ->

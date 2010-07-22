@@ -1,7 +1,7 @@
 <%=packageName ? "package ${packageName}\n\n" : ''%>
 
 import fr.nadouani.grails.plugins.extjsscaffold.dto.ExtJsJSONResponse;
-import grails.converters.*
+import fr.nadouani.extjsscaffold.converters.JSON
 
 class ${className}Controller {
 
@@ -25,7 +25,10 @@ class ${className}Controller {
 		def ${propertyName}List = ${className}.list(params)
 		
 		def dataToRender = ['data' : ${className}.list(params), 'totalCount' : ${className}.count() ]
-		render dataToRender as JSON
+
+		JSON.use("dcmWithToString") {
+			render dataToRender as JSON
+		}
     }
 	
 	def save = {
@@ -95,8 +98,9 @@ class ${className}Controller {
 			render(contentType:"application/json", text:"{'success': false, 'errorMsg': '\${errorMsg}'}")
 		}
 		else {
-			JSON.use("deep")
-			render new ExtJsJSONResponse(true, ${propertyName}) as JSON
+			JSON.use("dcmWithToString") {
+				render new ExtJsJSONResponse(true, ${propertyName}) as JSON
+			}
 		}
 	}
 	
