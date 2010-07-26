@@ -107,8 +107,10 @@ ${className}Grid = Ext.extend(Ext.grid.GridPanel, {
 	        	cp = domainClass.constrainedProperties[p.name]
 	            display = (cp ? cp.display : true)        
 	            if (display) {
-	            	if(p.isAssociation()){%>
-	            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, renderer: function(value) {return value.length>0 ? value.length  + " instance(s)":"";}},	
+	            	if(p.isAssociation() && (p.isManyToOne() || p.isOneToOne())){%>
+	            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, renderer: function(value) {return value.toString}},
+	            	<%}else if(p.isAssociation()){%>	
+	            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, renderer: function(value) {return value.length>0 ? value.length + " instance(s)":"";}},
 	            	<%}else{%>
 	            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, sortable:true},		
 	            	<%}}}%>

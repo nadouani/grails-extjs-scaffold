@@ -127,7 +127,7 @@
 			sb << "\n\troot: 'data',"
 			sb << "\n\ttotalProperty: 'totalCount',"
 			sb << "\n\tidProperty: 'id',"
-			sb << "\n\tfields: ["
+			sb << "\n\tfields: [{name: 'toStringValue', mapping: 'toString'},"
 			
 			// Render the store fields
 			def excludedProps = Event.allEvents.toList() << 'version'
@@ -148,14 +148,14 @@
 			sb << "\nfieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
 			sb << "\nvalueField:'id',"
 			sb << "\nhiddenName:'${property.name}.id',"
-			sb << "\ndisplayField:'nom',"
+			sb << "\ndisplayField:'toStringValue',"
 			sb << "\nmode: 'remote',"
 			sb << "\ntriggerAction:'all',"
 			sb << "\nforceSelection:true,"
 			sb << "\nenableKeyEvents:true,"
 			sb << "\npageSize:10,"
 			sb << "\nresizable:true,"
-			sb << "\nemptyText:'Select a ${property.type.name}...',"
+			sb << "\nemptyText:'Select a ${property.referencedDomainClass.propertyName}...',"
 			sb << "\nselectOnFocus:true"
 			sb << "\n},"
 			
@@ -168,7 +168,6 @@
 	}
 	
 	private renderOneToMany(domainClass, property){
-		// TODO : show correct store fields and grid columns
 		def sb = new StringBuffer();
 		
 		sb << "{"

@@ -132,4 +132,8 @@ public class DomainClassMarshallerWithToString extends DomainClassMarshaller {
         writer.key("id").value(extractValue(refObj, idProperty));
         writer.endObject();
     }
+    
+    protected boolean isRenderDomainClassRelations() {
+        return true;
+    }
 }
