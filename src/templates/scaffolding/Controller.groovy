@@ -1,6 +1,6 @@
 <%=packageName ? "package ${packageName}\n\n" : ''%>
 
-import fr.nadouani.grails.plugins.extjsscaffold.dto.ExtJsJSONResponse;
+import fr.nadouani.extjsscaffold.dto.ExtJsJSONResponse;
 import grails.converters.JSON
 
 class ${className}Controller {

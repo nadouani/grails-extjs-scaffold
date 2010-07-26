@@ -1,4 +1,4 @@
-package fr.nadouani.grails.plugins.extjsscaffold.dto;
+package fr.nadouani.extjsscaffold.dto;
 
 public class ExtJsJSONResponse {
 	private boolean success;
