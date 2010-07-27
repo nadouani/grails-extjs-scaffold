@@ -40,7 +40,6 @@ public class DomainClassMarshallerWithToString extends DomainClassMarshaller {
         BeanWrapper beanWrapper = new BeanWrapperImpl(value);
 
         writer.object();
-        writer.key("class").value(domainClass.getClazz().getName());
         writer.key("toString").value(value.toString());
 
         GrailsDomainClassProperty id = domainClass.getIdentifier();
@@ -127,7 +126,6 @@ public class DomainClassMarshallerWithToString extends DomainClassMarshaller {
     protected void asShortObject(Object refObj, JSON json, GrailsDomainClassProperty idProperty, GrailsDomainClass referencedDomainClass) throws ConverterException {
         JSONWriter writer = json.getWriter();
         writer.object();
-        writer.key("class").value(referencedDomainClass.getName());
         writer.key("toString").value(refObj.toString());
         writer.key("id").value(extractValue(refObj, idProperty));
         writer.endObject();

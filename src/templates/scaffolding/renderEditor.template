@@ -14,10 +14,8 @@
 	else if (property.type == Date.class || property.type == java.sql.Date.class || property.type == java.sql.Time.class || property.type == Calendar.class)
 		out << renderDateEditor(domainClass, property)
 		
-//	else if (property.type == URL.class)
-//		out << renderStringEditor(domainClass, property)
-//	else if (property.isEnum())
-//		out << renderEnumEditor(domainClass, property)
+	else if (property.isEnum())
+		out << renderEnumEditor(domainClass, property)
 		
 	else if (property.manyToOne || property.oneToOne)
 		out << renderManyToOne(domainClass, property)
@@ -45,6 +43,24 @@
 		
 		return sb.toString()
     }
+	
+	// Render enum field's editor
+	private renderEnumEditor(domainClass, property){
+		def sb = new StringBuffer()
+		sb << "{xtype:'combo', "
+		sb << "store:<extjsUtils:array data=\"\${${property.type.name}?.values()}\"/>, "
+		sb << "name:'${property.name}', "
+		sb << "fieldLabel:'<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', "
+		sb << "triggerAction:'all', "
+		sb << "emptyText:'Select a <g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />...', "
+		sb << "editable:false,"
+		
+		// Client side validation for string values
+		if (!cp.blank || !cp.nullable) sb << "allowBlank: false, "
+		
+		sb << "}, "
+		return sb.toString()
+	}
 
 	// Render boolean field's input
 	private renderBooleanEditor(domainClass, property) {
@@ -87,7 +103,6 @@
 				sb << "fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
 				sb << "triggerAction:'all',"
 				sb << "emptyText:'Select a <g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />...',"
-				sb << "selectOnFocus:true,"
 				sb << "editable:false,"
 			}            
 			else {
@@ -123,12 +138,11 @@
 				if (cp.inList) {
 					def sb = new StringBuffer()
 					sb << "{xtype:'combo', "
-					sb << "store:<extjsUtils:stringArray data=\"\${${domainInstance}.constraints.${property.name}.inList}\"/>, "
+					sb << "store:<extjsUtils:array data=\"\${${domainInstance}.constraints.${property.name}.inList}\"/>, "
 					sb << "name:'${property.name}', "
 					sb << "fieldLabel:'<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', "
 					sb << "triggerAction:'all', "
 					sb << "emptyText:'Select a <g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />...', "
-					sb << "selectOnFocus:true,"
 					sb << "editable:false,"
 					
 					// Client side validation for string values
@@ -149,7 +163,7 @@
 					if (cp.minSize) sb << "minLength: '${cp.minSize}', "
 					if (!cp.editable) sb << "readonly: true, "
 					if (cp.email) sb << "vtype: 'email', "
-					if (cp.url) sb << "vtype: 'url', "
+					if (cp.url || property.type == URL.class) sb << "vtype: 'url', "
 					
 					sb << "}, "
 					return sb.toString()
