@@ -4,28 +4,58 @@
 <%  
 	if (property.type == Boolean.class || property.type == boolean.class)
 		out << renderBooleanEditor(domainClass, property)
+		
 	else if (Number.class.isAssignableFrom(property.type) || (property.type.isPrimitive() && property.type != boolean.class))
 		out << renderNumberEditor(domainClass, property)
+		
 	else if (property.type == String.class || property.type == URL.class)
 		out << renderStringEditor(domainClass, property)
+		
 	else if (property.type == Date.class || property.type == java.sql.Date.class || property.type == java.sql.Time.class || property.type == Calendar.class)
 		out << renderDateEditor(domainClass, property)
+		
+//	else if (property.type == URL.class)
+//		out << renderStringEditor(domainClass, property)
+//	else if (property.isEnum())
+//		out << renderEnumEditor(domainClass, property)
+		
 	else if (property.manyToOne || property.oneToOne)
 		out << renderManyToOne(domainClass, property)
+		
 	else if ((property.oneToMany && !property.bidirectional) || (property.manyToMany && property.isOwningSide()))
 		out << renderManyToMany(domainClass, property)
+		
 	else if (property.oneToMany)
 		out << renderOneToMany(domainClass, property)
+		
 	else	
 		out << renderTextFieldEditor(domainClass, property)
 
-    private renderTextFieldEditor(domainClass, property) {
-        return "{xtype: 'textfield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', anchor: '100%'}, "
+
+	// Render unhandled type of data	
+	private renderTextFieldEditor(domainClass, property) {
+		def sb = new StringBuffer()
+		
+		sb << "{"
+		sb << "xtype: 'textfield',"
+		sb << "name: '${property.name}',"
+		sb << "fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
+		sb << "anchor: '100%'"
+		sb << "}, "
+		
+		return sb.toString()
     }
 
 	// Render boolean field's input
 	private renderBooleanEditor(domainClass, property) {
-		return "{xtype: 'checkbox', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />'}, "
+		def sb = new StringBuffer()
+		
+		sb << "{xtype: 'checkbox',"
+		sb << "name: '${property.name}',"
+		sb << "fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
+		sb << "}, "
+		
+		return sb.toString()
 	}
 	
 	// Render number field's input
@@ -39,27 +69,48 @@
 			}
 		}
 		else {
+			def sb = new StringBuffer()
+			sb << "{"			
+			
 			if (cp.range) {
-				return "{xtype: 'spinnerfield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', decimalPrecision:0, maxValue:${cp.range.to}, minValue:${cp.range.from}}, "
+				sb << "xtype: 'spinnerfield',"
+				sb << "name: '${property.name}',"
+				sb << "fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
+				sb << "decimalPrecision:0,"
+				sb << "maxValue:${cp.range.to},"
+				sb << "minValue:${cp.range.from},"
 			}
 			else if (cp.inList) {
-				return """{\
-					xtype:'combo',
-					store: \${${domainInstance}.constraints.${property.name}.inList},
-					name: '${property.name}',
-					fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',
-					triggerAction:'all',
-					emptyText:'Select a <g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />...',
-					selectOnFocus:true
-				},"""
+				sb << "xtype:'combo', "
+				sb << "store: \${${domainInstance}.constraints.${property.name}.inList},"
+				sb << "name: '${property.name}',"
+				sb << "fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
+				sb << "triggerAction:'all',"
+				sb << "emptyText:'Select a <g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />...',"
+				sb << "selectOnFocus:true,"
+				sb << "editable:false,"
 			}            
 			else {
-				return "{xtype: 'numberfield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />'}, "
+				sb << "xtype: 'numberfield',"
+				sb << "name: '${property.name}',"
+				sb << "fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
+			
+				// Client side validation for max and min number values
+				if (cp.max) sb << "maxValue: '${cp.max}', "
+				if (cp.min) sb << "minValue: '${cp.min}', "
 			}
+
+			// Client side validation for number values
+			if (!cp.nullable) sb << "allowBlank: false, "
+			if (cp.scale) sb << "decimalPrecision: '${cp.scale}', "
+			
+			sb << "},"
+
+			return sb.toString()
 		}
 	}
 
-	// Render number field's input
+	// Render string field's input
 	private renderStringEditor(domainClass, property) {
 		if (!cp) {
 			return "{xtype: 'textfield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />'}, "
@@ -77,7 +128,12 @@
 					sb << "fieldLabel:'<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', "
 					sb << "triggerAction:'all', "
 					sb << "emptyText:'Select a <g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />...', "
-					sb << "selectOnFocus:true"
+					sb << "selectOnFocus:true,"
+					sb << "editable:false,"
+					
+					// Client side validation for string values
+					if (!cp.blank || !cp.nullable) sb << "allowBlank: false, "
+					
 					sb << "}, "
 					return sb.toString()
 				} else if(cp.widget && cp.widget == "htmlEditor"){
@@ -86,8 +142,11 @@
 					def sb = new StringBuffer("{xtype: 'textfield', name: '${property.name}', ")
 					sb << "fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', "
 					
+					// Client side validation for string values
+					if (!cp.blank || !cp.nullable) sb << "allowBlank: false, "
 					if (cp.password) sb << "inputType: 'password', "
 					if (cp.maxSize) sb << "maxLength: '${cp.maxSize}', "
+					if (cp.minSize) sb << "minLength: '${cp.minSize}', "
 					if (!cp.editable) sb << "readonly: true, "
 					if (cp.email) sb << "vtype: 'email', "
 					if (cp.url) sb << "vtype: 'url', "
@@ -106,6 +165,8 @@
 		else {
 			def sb = new StringBuffer("{xtype: 'datefield', name: '${property.name}', fieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />', ")
 			
+			// Client side validation for string values
+			if (!cp.blank || !cp.nullable) sb << "allowBlank: false, "
 			if (!cp.editable) sb << "readOnly: true, "
 			
 			sb << "}, "
