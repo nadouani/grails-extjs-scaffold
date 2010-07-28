@@ -73,7 +73,7 @@ ${className}Form = Ext.extend(Ext.form.FormPanel, {
 			    	]}
 		    	<%}%>
 		    ],
-	        tbar: [{
+	        buttons: [{
 	        	text: 'Save', 
 	        	iconCls: 'icon-save',
 	        	scope:this,
