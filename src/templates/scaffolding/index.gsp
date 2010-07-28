@@ -110,9 +110,7 @@ ${className}Grid = Ext.extend(Ext.grid.GridPanel, {
 	            	if(p.isAssociation() && (p.isManyToOne() || p.isOneToOne())){%>
 	            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, renderer: function(value) {return value.toString}},
 	            	<%}else if(p.isAssociation()){%>	
-	            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, renderer: function(value) {return value.length>0 ? value.length + " instance(s)":"";}},
-	            	<%}else if(p.isEnum()){%>	
-	            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, sortable:true, renderer: function(value) {return value.name}},
+	            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, renderer: function(value) {return value.length>0 ? value.length + " instance(s)":"";}},	            	
 	            	<%}else{%>
 	            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, sortable:true},		
 	            	<%}}}%>
