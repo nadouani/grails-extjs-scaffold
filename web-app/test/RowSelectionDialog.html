@@ -15,9 +15,9 @@
 		Ext.onReady(function(){
 
 			var form = new Ext.form.FormPanel({
-				title: 'Simple form',
 				renderTo: 'form-elem',
-				width: 400,
+				border: false,
+				width: 300,
 		        items: [{
 			        id: 'myText',
 					fieldLabel: 'selected value',
@@ -27,8 +27,8 @@
 
 		        fbar: {
 		            xtype: 'toolbar',
-		            items: ['->',{
-		                text: 'Max All',
+		            items: [{
+		                text: 'Browse',
 		                handler: function(){
 							var myData = [
 					              [1, 'Nabil Adouani'],
