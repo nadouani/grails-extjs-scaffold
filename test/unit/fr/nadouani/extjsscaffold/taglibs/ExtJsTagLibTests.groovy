@@ -1,4 +1,4 @@
-package fr.nadouani.grails.plugins.extjsscaffold
+package fr.nadouani.extjsscaffold.taglibs
 
 import grails.test.*
 

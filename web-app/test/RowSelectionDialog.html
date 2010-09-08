@@ -1,0 +1,55 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="../js/extjs/resources/css/ext-all.css" />
+  		
+  		<script type="text/javascript" src="../js/extjs/adapter/ext/ext-base.js"></script>
+    	<script type="text/javascript" src="../js/extjs/ext-all-debug.js"></script>
+    	<script type="text/javascript" src="../js/extjs/lib/RowSelectorDialog.js"></script>
+	</head>
+	<body>
+		<h1>Row Selection Dialog</h1>
+
+		<div id="form-elem"></div>
+		
+		<script>
+		Ext.onReady(function(){
+
+			var form = new Ext.form.FormPanel({
+				title: 'Simple form',
+				renderTo: 'form-elem',
+				width: 400,
+		        items: [{
+			        id: 'myText',
+					fieldLabel: 'selected value',
+			        labelWidth: 150,
+		            xtype: 'textfield'
+		        }],
+
+		        fbar: {
+		            xtype: 'toolbar',
+		            items: ['->',{
+		                text: 'Max All',
+		                handler: function(){
+							var myData = [
+					              [1, 'Nabil Adouani'],
+					              [2, 'Nawfel Salem'],
+					              [3, 'Brahim Loukil'],
+					          ];
+				
+						    var win = new Ext.Grails.ux.RowSelectorDialog({
+						    	renderTo: Ext.getBody(),
+					            title : 'Row Selector Dialog Sample',
+					            data : myData,
+					            field: Ext.getCmp('myText')
+				            });
+				            win.show();		                    
+		                }
+		            }]
+		        }
+		    });
+
+		});
+		</script>
+	</body>
+</html>
+
