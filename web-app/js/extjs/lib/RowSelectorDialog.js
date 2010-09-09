@@ -9,7 +9,8 @@
     	this.title = cfg.title || 'Select a row';
     	this.store = cfg.store || new Ext.data.ArrayStore({fields: [ 'id', 'value']});
     	this.data = cfg.data;
-    	this.field = cfg.field || null;
+    	this.valueField = cfg.valueField || null;
+    	this.displayField = cfg.displayField || null;
     	
         $cls.superclass.constructor.call(this, Ext.apply({
             title: this.title,
@@ -23,7 +24,6 @@
 				    store: this.store,
 				    region: 'center',
 				    border: false,
-				
 
 				    columns:[{
 				        header: "ID",
@@ -53,9 +53,10 @@
 				    listeners: {
 		                rowdblclick: function (grid, rowIndex, e) {
 		        			var record = grid.getStore().getAt(rowIndex);
-		        			//Ext.MessageBox.alert('double click event', 'the selected row has the is [' + record.data.id +']')
 		        			
-		        			this.field.setValue(record.data.value);
+		        			this.valueField.setValue(record.data.id);
+		        			this.displayField.setValue(record.data.value);
+		        			this.fireEvent ('selected');
 		        			this.close();
 		                },
 		                scope: this
@@ -70,7 +71,9 @@
                 		var record = this.grid.getSelectionModel().getSelected();
                 		
                 		if(record != null){
-                			this.field.setValue(record.data.value);
+                			this.valueField.setValue(record.data.id);
+		        			this.displayField.setValue(record.data.value);
+                			this.fireEvent ('selected');
                     		this.close();
                 		}else{
                 			Ext.MessageBox.alert('Alert', 'Please select a row.');
@@ -80,6 +83,8 @@
                 }
             ],
         },cfg));
+        
+        this.addEvents('selected');
         
         this.store.loadData(this.data);
     };

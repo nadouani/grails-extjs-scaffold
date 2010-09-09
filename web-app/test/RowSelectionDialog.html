@@ -18,12 +18,25 @@
 				renderTo: 'form-elem',
 				border: false,
 				width: 300,
-		        items: [{
-			        id: 'myText',
-					fieldLabel: 'selected value',
-			        labelWidth: 150,
-		            xtype: 'textfield'
-		        }],
+				frame: true,
+		        title: 'Select Person',
+		        defaults: {
+		            anchor: '95%',
+		            allowBlank: false,
+		            msgTarget: 'side'
+		        },
+		        items: [
+					this.valueField = new Ext.form.TextField({
+						fieldLabel: 'selected id',
+				        labelWidth: 150,
+				        readOnly: true
+			        }),
+					this.displayField = new Ext.form.TextField({
+						fieldLabel: 'selected value',
+				        labelWidth: 150,
+				        readOnly: true
+			        })
+				],
 
 		        fbar: {
 		            xtype: 'toolbar',
@@ -34,16 +47,17 @@
 					              [1, 'Nabil Adouani'],
 					              [2, 'Nawfel Salem'],
 					              [3, 'Brahim Loukil'],
-					          ];
+					         ];
 				
 						    var win = new Ext.Grails.ux.RowSelectorDialog({
 						    	renderTo: Ext.getBody(),
 					            title : 'Row Selector Dialog Sample',
 					            data : myData,
-					            field: Ext.getCmp('myText')
+					            valueField: this.valueField,
+					            displayField: this.displayField
 				            });
 				            win.show();		                    
-		                }
+		                },scope: this
 		            }]
 		        }
 		    });
