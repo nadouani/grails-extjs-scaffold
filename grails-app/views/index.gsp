@@ -12,6 +12,10 @@
     <script type="text/javascript" src="${resource(dir:'js/extjs/ux',file:'SpinnerField.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/ux',file:'Ext.ux.Toast.js')}"></script>
     
+    <!-- Plugin libs -->
+    <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'RowSelectorDialog.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'RowSelectorField.js')}"></script>
+    
     <!-- Extensions css -->
     <link rel="stylesheet" href="${resource(dir:'js/extjs/ux/css',file:'Spinner.css')}" />
 

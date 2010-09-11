@@ -190,49 +190,16 @@
 
 	private renderManyToOne(domainClass, property){
 		if (property.association) {
-			// TODO : show correct fields
 			def sb = new StringBuffer();
 			
-			sb << "{"
-			sb << "\nxtype:'combo',"
-			sb << "\nstore: new Ext.data.JsonStore({"
-			sb << "\n\turl: '<g:resource dir=\"${property.referencedDomainClass.propertyName}\" file=\"list\" />',"
-			sb << "\n\tremoteSort: true,"
-			sb << "\n\tautoLoad:true,"
-			sb << "\n\troot: 'data',"
-			sb << "\n\ttotalProperty: 'totalCount',"
-			sb << "\n\tidProperty: 'id',"
-			sb << "\n\tfields: [{name: 'toStringValue', mapping: 'toString'},"
-			
-			// Render the store fields
-			def excludedProps = Event.allEvents.toList() << 'version'
-			def props = property.referencedDomainClass.properties.findAll { !excludedProps.contains(it.name) && !it.isAssociation()}		
-			Collections.sort(props, DomainClassPropertyComparator.class.constructors[0].newInstance([property.referencedDomainClass] as Object[]))
-			
-			props.each { p -> 
-				def cp = property.referencedDomainClass.constrainedProperties[p.name]
-				def display = (cp ? cp.display : true)        
-				if (display) { 
-					sb << "'${p.name}',"      	
-				}
-			}
-			
-			sb << "]"
-			sb << "\n}),"			
-			sb << "\nname: '${property.name}.id',"
-			sb << "\nfieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
-			sb << "\nvalueField:'id',"
-			sb << "\nhiddenName:'${property.name}.id',"
-			sb << "\ndisplayField:'toStringValue',"
-			sb << "\nmode: 'remote',"
-			sb << "\ntriggerAction:'all',"
-			sb << "\nforceSelection:true,"
-			sb << "\nenableKeyEvents:true,"
-			sb << "\npageSize:10,"
-			sb << "\nresizable:true,"
-			sb << "\nemptyText:'Select a ${property.referencedDomainClass.propertyName}...',"
-			sb << "\nselectOnFocus:true"
-			sb << "\n},"
+			sb << "new Ext.Grails.ux.RowSelectorField({"
+			sb << "\n\tdialogTitle:'Select a ${property.referencedDomainClass.propertyName}...',"
+			sb << "\n\tfieldLabel: '<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
+			sb << "\n\tname: '${property.name}.id',"
+			sb << "\n\tdisplayProperty : 'toString',"
+			sb << "\n\tform: this,"
+			sb << "\n\turlList: '<g:resource dir=\"${property.referencedDomainClass.propertyName}\" file=\"list\" />'"
+			sb << "\n}),"
 			
 			return sb.toString()
 		}

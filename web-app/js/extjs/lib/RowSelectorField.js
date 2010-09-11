@@ -8,9 +8,30 @@
     
     var $cls = Ext.Grails.ux.RowSelectorField = function(cfg){
     	
+    	this.form = cfg.form;
     	this.dialogTitle = cfg.dialogTitle;
-    	this.data = cfg.data || [];
-    	this.store = cfg.store || new Ext.data.ArrayStore({fields: [ 'id', 'value']});;
+    	
+    	this.valueProperty = 'id';
+    	this.displayProperty = cfg.displayProperty || 'toString';
+    	
+    	this.hiddenName = cfg.name;
+    	this.rootProperty = cfg.name.split(".")[0];
+    	cfg.name = this.rootProperty + '.' + this.displayProperty;
+    	
+    	if(cfg.store){
+    		this.store = cfg.store;
+    	}else if(cfg.urlList){
+    		this.urlList = cfg.urlList;
+    		this.store = new Ext.data.JsonStore({
+    			url: this.urlList,
+    			remoteSort: true,
+    			autoLoad:true,
+    			root: 'data',
+    			totalProperty: 'totalCount',
+    			idProperty: 'id',
+    			fields: ['id', {name: 'value', mapping: this.displayProperty}]
+    		});
+    	}
     	
         $cls.superclass.constructor.call(this, Ext.apply({
     	    validationEvent:false,
@@ -19,7 +40,6 @@
 		    trigger2Class:'x-form-search-trigger',
 		    hideTrigger1:true,
 		    width:180,
-		    hasSearch : false,
 		    editable: false
         },cfg));
         
@@ -29,7 +49,19 @@
             if(e.getKey() == e.ENTER){
                 this.onTrigger2Click();
             }
-        }, this);
+        }, this); 
+        
+        this.form.on({
+        	actioncomplete : function(form, action){
+        		if(action.type == 'load'){
+        			var idValue = action.result.data[this.rootProperty][this.valueProperty];
+        			var displayValue = action.result.data[this.rootProperty][[this.displayProperty]];
+        			
+        			this.setValues(idValue, displayValue);
+        		}
+        	},
+        	scope: this
+        });
     };
 
     Ext.extend($cls, Ext.form.TwinTriggerField, { 
@@ -38,37 +70,33 @@
     		Ext.Grails.ux.RowSelectorField.superclass.onRender.call(this, ct, position);
 
     		this.wrap = this.el.parent('.x-form-field-wrap');
-            this.el.dom.removeAttribute('name');
 
             this.hiddenField = new Ext.form.Hidden({
             	renderTo: this.wrap,
-            	id: this.name + '_id',
-                name: this.name,
+                name: this.hiddenName,
                 tag: 'input',
                 type: 'text',
                 cls: 'x-form-hidden x-form-field',
             });
+            
         },
-    	
+        
     	// Clear button
     	onTrigger1Click : function(){
-	        if(this.hasSearch){
-	            this.el.dom.value = '';
-	            this.triggers[0].hide();
-	            this.hasSearch = false;
-	        }
+            //this.el.dom.value = '';
+        	this.setValues('', '');
+            this.triggers[0].hide();
 	    },
 	
 	    // Search button
 	    onTrigger2Click : function(){
 		    var win = new Ext.Grails.ux.RowSelectorDialog({
 	            title : this.dialogTitle,
-	            data : this.data,
+	            store : this.store,
 	            valueField: this.hiddenField,
 	            displayField: this,
 	            listeners: {
 		    		selected: function(){
-				    	this.hasSearch = true;
 				        this.triggers[0].show();
 				        this.fireEvent('selected');
 		    		},
@@ -80,8 +108,16 @@
 	    
 	    getValue: function(){
 	    	return this.hiddenField.getValue();
+	    },
+	    
+	    setValues: function(idValue, displayValue){
+	    	if(idValue!= '' && displayValue != ''){
+	    		this.triggers[0].show();
+	    	}
+	    	this.hiddenField.setValue(idValue);
+	    	this.setValue(displayValue);
 	    }
-
+	    
     });
     
 })();

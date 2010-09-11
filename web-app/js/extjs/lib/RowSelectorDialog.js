@@ -7,8 +7,7 @@
     
     var $cls = Ext.Grails.ux.RowSelectorDialog = function(cfg){
     	this.title = cfg.title || 'Select a row';
-    	this.store = cfg.store || new Ext.data.ArrayStore({fields: [ 'id', 'value']});
-    	this.data = cfg.data;
+    	this.store = cfg.store
     	this.valueField = cfg.valueField || null;
     	this.displayField = cfg.displayField || null;
     	
@@ -86,7 +85,7 @@
         
         this.addEvents('selected');
         
-        this.store.loadData(this.data);
+        this.store.load();
     };
     
 
