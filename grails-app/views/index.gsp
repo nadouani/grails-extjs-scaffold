@@ -5,21 +5,29 @@
   	<link rel="stylesheet" href="${resource(dir:'css/',file:'layout.css')}" />
     
     <script type="text/javascript" src="${resource(dir:'js/extjs/adapter/ext/',file:'ext-base.js')}"></script>
-    <script type="text/javascript" src="${resource(dir:'js/extjs/',file:'ext-all.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'js/extjs/',file:'ext-all-debug.js')}"></script>
     
     <!-- Extensions -->
     <script type="text/javascript" src="${resource(dir:'js/extjs/ux',file:'Spinner.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/ux',file:'SpinnerField.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/ux',file:'Ext.ux.Toast.js')}"></script>
-    
-    <!-- Plugin libs -->
+
+	<!-- Plugin libs -->
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'EntityGridPanel.js')}"></script>
-    <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'EntityFormPanel.js')}"></script>    
+    <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'EntityFormPanel.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'RowSelectorDialog.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'RowSelectorField.js')}"></script>
     
     <!-- Extensions css -->
     <link rel="stylesheet" href="${resource(dir:'js/extjs/ux/css',file:'Spinner.css')}" />
+    
+    <style type="text/css">
+    	.x-tree-node div.menu-node{		    
+		    margin-top:1px;
+		    padding-top:5px;
+		    padding-bottom:5px;
+		}
+    </style>
 
     <script type="text/javascript">
     Ext.onReady(function(){
@@ -58,7 +66,37 @@
                 items: [{
 						region: 'center',
 						border: true,
-						title: 'Application menu'
+						title: 'Application menu',
+						layout: 'fit',
+						items: [
+							new Ext.tree.TreePanel({
+								flex: 1,
+								border: false,
+								rootVisible:false,
+								autoScroll:true,
+								lines:false,
+								root:new Ext.tree.AsyncTreeNode({
+						            expanded: true,
+						            children: [
+										<g:each var="c" in="${grailsApplication.controllerClasses}">
+										{
+											text: '${c.logicalPropertyName}',
+							                cls: 'menu-node',
+							                icon: '${resource(dir:'images/skin',file:'grid.png')}',
+							                leaf: true,
+							                listeners:{
+												click: function(){
+							                		Ext.getCmp('tabList${c.name}').show();
+							                	}
+								            }
+										},
+										</g:each>
+						            ]
+						        }),
+
+								collapseFirst:false
+							})
+						]
 					},{
 						region: 'south',
 						title: 'Application settings',
