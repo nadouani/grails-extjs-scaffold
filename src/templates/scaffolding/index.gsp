@@ -8,174 +8,88 @@
     Collections.sort(props, comparator.constructors[0].newInstance([domainClass] as Object[]))
 %>  
 
-${className}Grid = Ext.extend(Ext.grid.GridPanel, {
-	constructor:function(config) {
-		config = config || {};
-		config.listeners = config.listeners || {};
 
-		${className}Grid.superclass.constructor.call(this, config);
-	},
-	
-	initComponent: function() {
-		var proxy = new Ext.data.HttpProxy({
-		    api: {
-		        read : '<g:resource dir="${entityName}" file="list" />',
-		        create : '<g:resource dir="${entityName}" file="save" />',
-		        update: '<g:resource dir="${entityName}" file="update" />',
-		        destroy: '<g:resource dir="${entityName}" file="delete" />'
-		    }
-		});
+(function(){
+    
+    Ext.ns('GrailsApp.ext.grid');
+    
+    var \$cls = GrailsApp.ext.grid.${className}Grid = function(cfg){
+    	
+        \$cls.superclass.constructor.call(this, Ext.apply({
+        	entity: '${className}',
+			entityLabel : '\${entityLabel}',
 		
-		var reader = new Ext.data.JsonReader({
-		    totalProperty: 'totalCount',
-		    successProperty: 'success',
-		    idProperty: 'id',
-		    root: 'data',
-		    messageProperty: 'message'
-		}, [
-			<%  
-	        props.each { p -> 
-	        	cp = domainClass.constrainedProperties[p.name]
-	            display = (cp ? cp.display : true)        
-	            if (display) { 
-		    %>'${p.name}',<%  }   } %>
-		]);
+			// store properties
+			fields : [<%  
+		        props.each { p -> 
+		        	cp = domainClass.constrainedProperties[p.name]
+		            display = (cp ? cp.display : true)        
+		            if (display) { 
+			    %>'${p.name}',<%  }   } %>],
+			urlRead : '<g:resource dir="${entityName}" file="list" />',
+		    urlCreate : '<g:resource dir="${entityName}" file="save" />',
+		    urlUpdate: '<g:resource dir="${entityName}" file="update" />',
+		    urlDestroy: '<g:resource dir="${entityName}" file="delete" />',
 		
-		var writer = new Ext.data.JsonWriter({
-		    encode: true,
-		    writeAllFields: false
-		});		
-		
-		var store = new Ext.data.Store({
-		    proxy: proxy,
-		    reader: reader,
-		    writer: writer, 
-		    autoSave: true 
-		});
-		
-		var config = {
-			store: store,
-	        loadMask: true,
-	        layout: 'anchor',
-	        border:false,
-	        selModel : new Ext.grid.RowSelectionModel( {
-				singleSelect : true
-			}),
-	        columns:this.getColumnsModel(),
-	        viewConfig: {
-	            forceFit:true,
-	            enableRowBody:true,
-	            emptyText: 'No data to display',
-	        },
-	        bbar: this.getBottomBar(store),
-	        tbar: this.getToolbar()
-		}
-		
-		this.on('rowdblclick', function(grid, rowIndex, e) {
+		    // structure properies
+		    columns:[
+		       	<%  
+		        props.each { p -> 
+		        	cp = domainClass.constrainedProperties[p.name]
+		            display = (cp ? cp.display : true)        
+		            if (display) {
+		            	if(p.isAssociation() && (p.isManyToOne() || p.isOneToOne())){%>
+            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, renderer: function(value) {return value.toString}},
+		            	<%}else if(p.isAssociation()){%>	
+            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, renderer: function(value) {return value.length>0 ? value.length + " instance(s)":"";}},	            	
+		            	<%}else{%>
+            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, sortable:true},		
+		            	<%}}}%>
+		    ],    
+			
+		   	// Toolbar
+			newButtonLabel : '<g:message code="default.button.create.label" default="Create" /> ${className}',
+			editButtonLabel : '<g:message code="default.button.edit.label" default="Edit" /> ${className}',
+			deleteButtonLabel : '<g:message code="default.button.delete.label" default="delete" /> ${className}',
+			
+			// Handlers
+			newButtonHandler: this.createFn,
+			rowDblClickHandler: this.rowDblClickFn
+        },cfg));
+        
+    };
+
+    Ext.extend(\$cls, Ext.Grails.ux.EntityGridPanel, { 
+   		createFn: function(){
+			var formTab = new GrailsApp.ext.form.${className}Form({
+				title : '<g:message code="default.new.label" args="[entityLabel]" />',
+				closable: true,
+				actionName : 'create',				
+				callerComponent: Ext.getCmp('tabList${className}')
+			});
+			
+			var tabs = Ext.getCmp("content-panel");
+			tabs.add(formTab).show();
+    	},
+    	
+    	rowDblClickFn: function(grid, rowIndex, e) {
 			var record = grid.getStore().getAt(rowIndex);
 			
-			var formTab = new ${className}Form({
+			var formTab = new GrailsApp.ext.form.${className}Form({
 	        	title : '<g:message code="default.button.edit.label" default="Edit" /> ${className}',
 	        	closable: true,
 	        	actionName : 'edit',
-	        	entityId: record.data.id
+	        	entityId: record.data.id,
+	        	callerComponent: Ext.getCmp('tabList${className}')
 	        });
 	        
 	        var tabs = Ext.getCmp("content-panel");
 	        tabs.add(formTab).show();
-		});
-		
-		Ext.data.DataProxy.addListener('write', function(proxy, action, result, res, rs) {
-			Ext.ux.Toast.msg('Success', res.message, 3);
-		});
-				
-		Ext.data.DataProxy.addListener('exception', function(proxy, type, action, options, res) {
-		    if (type === 'remote') {
-		        Ext.ux.Toast.msg('Remote error', res.message, 5);
-		    }
-		});
-
-		Ext.apply(this,  Ext.apply(this.initialConfig, config));
-    	
-		${className}Grid.superclass.initComponent.apply(this, arguments);
-	},
-
-	getColumnsModel: function(){
-		return [
-	        <%  
-	        props.each { p -> 
-	        	cp = domainClass.constrainedProperties[p.name]
-	            display = (cp ? cp.display : true)        
-	            if (display) {
-	            	if(p.isAssociation() && (p.isManyToOne() || p.isOneToOne())){%>
-	            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, renderer: function(value) {return value.toString}},
-	            	<%}else if(p.isAssociation()){%>	
-	            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, renderer: function(value) {return value.length>0 ? value.length + " instance(s)":"";}},	            	
-	            	<%}else{%>
-	            	{header: '<g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" />', dataIndex: '${p.name}', width: 50, sortable:true},		
-	            	<%}}}%>
-	        ];
-	},
-	
-	getBottomBar: function(store){
-		return new Ext.PagingToolbar({
-	            pageSize: 10,
-	            store: store,
-	            displayInfo: true,
-	            displayMsg: 'total {2} results found. Current shows {0} - {1}',
-	            emptyMsg: "No data to display"
-	        });
-	},
-	
-	getToolbar: function(){
-		return [{
-	            text: '<g:message code="default.new.label" args="[entityLabel]" />',
-	            iconCls: 'icon-add',
-	            handler: function(){
-	                var formTab = new ${className}Form({
-	                	title : '<g:message code="default.new.label" args="[entityLabel]" />',
-	                	closable: true,
-	                	actionName : 'create'
-	                });
-	                
-	                var tabs = Ext.getCmp("content-panel");
-	                tabs.add(formTab).show();
-	            }
-	        },{
-	            text: '<g:message code="default.button.edit.label" default="Edit" /> ${className}',
-	            iconCls: 'icon-edit'
-	        },{
-	            text: '<g:message code="default.button.delete.label" default="Delete" /> ${className}',
-	            iconCls: 'icon-delete',
-	            handler: this.confirmDelete,
-            	scope: this
-	        }];
-	},
-	
-	onRender:function() {
-		${className}Grid.superclass.onRender.apply(this, arguments);
-		this.store.load({params:{start:0, limit:10}});
-	},
-	
-	confirmDelete : function(btn, ev) {
-		var count = this.getSelectionModel().getCount();
-        if(count > 0){
-        	Ext.MessageBox.confirm('Message', 'Do you really want to delete it?' , this.doDelete, this);	
-        }else{
-        	Ext.MessageBox.alert('Message', 'Please select at least one item to delete');
-        }
-    },
+		}
+    });
     
-    doDelete: function(btn){		
-    	if(btn == 'yes'){
-    		var record = this.getSelectionModel().getSelected();
-	        if (!record) {
-	            return false;
-	        }        
-	        this.store.remove(record);
-    	}	        
-    }
-});
+})();
+
 
 Ext.onReady(function(){
 	var tabs = Ext.getCmp("content-panel");
@@ -183,7 +97,7 @@ Ext.onReady(function(){
     var tabList${className} = new Ext.Panel({
     	id:'tabList${className}',
         title: '\${entityLabel}',
-        items:[new ${className}Grid()],
+        items:[new GrailsApp.ext.grid.${className}Grid()],
         layout:'fit'
     });
     tabs.add(tabList${className});
