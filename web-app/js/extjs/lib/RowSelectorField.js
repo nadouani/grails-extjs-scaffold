@@ -11,7 +11,8 @@
     	this.form = cfg.form;
     	this.dialogTitle = cfg.dialogTitle;
     	
-    	this.valueProperty = 'id';
+    	this.idProperty = 'id';    	
+    	this.valueProperty = 'value';
     	this.displayProperty = cfg.displayProperty || 'toString';
     	
     	this.hiddenName = cfg.name;
@@ -28,8 +29,8 @@
     			autoLoad:true,
     			root: 'data',
     			totalProperty: 'totalCount',
-    			idProperty: 'id',
-    			fields: ['id', {name: 'value', mapping: this.displayProperty}]
+    			idProperty: this.idProperty,
+    			fields: [this.idProperty, {name: this.valueProperty, mapping: this.displayProperty}]
     		});
     	}
     	
@@ -43,7 +44,7 @@
 		    editable: false
         },cfg));
         
-        this.addEvents('selected');
+        //this.addEvents('selected');
         
         this.on('specialkey', function(f, e){
             if(e.getKey() == e.ENTER){
@@ -51,10 +52,13 @@
             }
         }, this); 
         
+        
+        //TODO fix the problem of the this.form reference
+        /*
         this.form.on({
         	actioncomplete : function(form, action){
         		if(action.type == 'load'){
-        			var idValue = action.result.data[this.rootProperty][this.valueProperty];
+        			var idValue = action.result.data[this.rootProperty][this.idProperty];
         			var displayValue = action.result.data[this.rootProperty][[this.displayProperty]];
         			
         			this.setValues(idValue, displayValue);
@@ -62,6 +66,7 @@
         	},
         	scope: this
         });
+        */
     };
 
     Ext.extend($cls, Ext.form.TwinTriggerField, { 
@@ -96,9 +101,9 @@
 	            valueField: this.hiddenField,
 	            displayField: this,
 	            listeners: {
-		    		selected: function(){
+		    		selected: function(record){
 				        this.triggers[0].show();
-				        this.fireEvent('selected');
+				        this.setValues(record.data[this.idProperty], record.data[this.valueProperty]);
 		    		},
 		    		scope: this
 		    	}

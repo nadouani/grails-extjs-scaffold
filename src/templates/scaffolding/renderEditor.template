@@ -210,16 +210,9 @@
 	}
 	
 	private renderOneToMany(domainClass, property){
-		def sb = new StringBuffer();
-		
-		sb << "{"
-		sb << "\ntitle:'<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
-		sb << "\nxtype: 'grid',"
-		sb << "\nlayout: 'fit',"
-		sb << "\nborder:false,"
-		sb << "\nid: 'grid${domainClass.shortName}${property.referencedDomainClass.shortName}',"
-		sb << "\nstore: new ${domainClass.shortName}${property.referencedDomainClass.shortName}Store(),"
-		sb << "\ncolumns:["		
+		def sb = new StringBuffer()
+		def fields = "\n\t\t"
+		def cols = ""
 		
 		// loop on properties
 		//{header: '<g:message code="animal.id.label" default="Id" />', dataIndex: 'id', width: 50, sortable: true},      
@@ -230,17 +223,26 @@
     	props.each { p -> 
         	def cp = property.referencedDomainClass.constrainedProperties[p.name]
             def display = (cp ? cp.display : true)        
-            if (display) { 
-            	sb << "\n\t{header: '<g:message code=\"${property.referencedDomainClass.propertyName}.${p.name}.label\" default=\"${p.naturalName}\" />', dataIndex: '${p.name}', width: 50, sortable: true},"      	
+            if (display) {
+				fields += "{name: '${p.name}'}," 
+            	cols += "\n\t\t{header: '<g:message code=\"${property.referencedDomainClass.propertyName}.${p.name}.label\" default=\"${p.naturalName}\" />', dataIndex: '${p.name}', width: 50, sortable: true},"      	
         	}
         }
 		
-		sb << "\n],"
-		sb << "\nviewConfig: {forceFit:true,enableRowBody:true,emptyText: 'No data to display'},"
-		sb << "\ntbar: ["
-		sb << "\n\t{text: '<g:message code=\"default.button.new.label\" default=\"New\" /> ${property.referencedDomainClass.shortName}',iconCls: 'icon-add'},"
-		sb << "\n\t{text: '<g:message code=\"default.button.delete.label\" default=\"Delete\" /> ${property.referencedDomainClass.shortName}',iconCls: 'icon-delete'}"
-		sb << "\n]},"
+		sb << "this.grid${domainClass.shortName}${property.referencedDomainClass.shortName} = new Ext.Grails.ux.EntityCollectionGridPanel({"
+		sb << "\n\ttitle:'<g:message code=\"${domainClass.propertyName}.${property.name}.label\" default=\"${property.naturalName}\" />',"
+		sb << "\n\turlSelect: '<g:resource dir=\"${property.referencedDomainClass.propertyName}\" file=\"list\" />',"
+		sb << "\n\troot : '${property.name}',"
+		sb << "\n\tnewButtonLabel : '<g:message code=\"default.button.new.label\" default=\"New\" /> ${property.referencedDomainClass.shortName}',"
+		sb << "\n\tdeleteButtonLabel : '<g:message code=\"default.button.delete.label\" default=\"Delete\" /> ${property.referencedDomainClass.shortName}',"
+		sb << "\n\tselectButtonLabel : '<g:message code=\"default.button.select.label\" default=\"Select\" /> ${property.referencedDomainClass.shortName}',"
+		sb << "\n\tfields : ["
+		sb << fields
+		sb << "\n\t]"
+		sb << "\n\tcols : ["
+		sb << cols
+		sb << "\n\t]"
+		sb << "\n}),"
 		
 		return sb.toString()
 	}

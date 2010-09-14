@@ -5,34 +5,6 @@
 	associations = domainClass.properties.findAll {it.isAssociation() && it.oneToMany}
     Collections.sort(props, comparator.constructors[0].newInstance([domainClass] as Object[]))
 %> 
-<%
-associations.each { a ->
-	aShortName = a.referencedDomainClass.shortName
-	storeName = "${className}${aShortName}Store" 
-	
-	aProps = a.referencedDomainClass.properties.findAll { !excludedProps.contains(it.name) && !it.isAssociation()}
-	Collections.sort(aProps, comparator.constructors[0].newInstance([a.referencedDomainClass] as Object[]))
-%>
-${storeName} = Ext.extend(Ext.data.JsonStore, {
-	constructor:function(config) {
-		config = config || {
- 			autoDestroy: true,
-		    root: '${a.name}',
-		   	idProperty: 'id',
-		 	fields: [
-<% aProps.each{ p -> %>{name: '${p.name}'},<% } %>		       
-		    ]
-    	};
-		${storeName}.superclass.constructor.call(this, config);
-	},	
-	initComponent: function() {
-		Ext.apply(this,  Ext.apply(this.initialConfig, config));
-        ${storeName}.superclass.initComponent.apply(this, arguments);
-	}
-});
-<%
-}
-%>
 
 (function(){
     

@@ -48,6 +48,9 @@ a:hover {
 .icon-cancel {
     background-image:url(../images/skin/cancel.png) !important;
 }
+.icon-select {
+    background-image:url(../images/skin/find.png) !important;
+}
 .email-form .x-panel-mc .x-panel-tbar .x-toolbar {
     border-top:1px solid #C2D6EF;
     border-left:1px solid #C2D6EF;

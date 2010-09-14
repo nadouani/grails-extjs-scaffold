@@ -6,17 +6,21 @@
     Ext.namespace("Ext.Grails.ux");
     
     var $cls = Ext.Grails.ux.RowSelectorDialog = function(cfg){
+    	this.width = cfg.width || 400;
+    	this.height = cfg.height || 400;
     	this.title = cfg.title || 'Select a row';
     	this.store = cfg.store
     	this.valueField = cfg.valueField || null;
     	this.displayField = cfg.displayField || null;
     	
+    	this.columns = cfg.columns || [{header: "ID",dataIndex: 'id',sortable: true},{header: "Value", dataIndex: 'value', sortable: true}];
+    	
         $cls.superclass.constructor.call(this, Ext.apply({
             title: this.title,
             layout:'border',
             modal: true,
-            width: 400,
-            height: 400,
+            width: this.width,
+            height: this.height,
             
             items: [
                 this.grid = new Ext.grid.GridPanel({
@@ -24,16 +28,7 @@
 				    region: 'center',
 				    border: false,
 
-				    columns:[{
-				        header: "ID",
-				        dataIndex: 'id',
-				        width: 50,
-				        sortable: true
-				    },{
-				        header: "Value",
-				        dataIndex: 'value',
-				        sortable: true
-				    }],
+				    columns: this.columns,
 				
 				    sm: new Ext.grid.RowSelectionModel({
 				    	singleSelect:true,
@@ -53,9 +48,7 @@
 		                rowdblclick: function (grid, rowIndex, e) {
 		        			var record = grid.getStore().getAt(rowIndex);
 		        			
-		        			this.valueField.setValue(record.data.id);
-		        			this.displayField.setValue(record.data.value);
-		        			this.fireEvent ('selected');
+		        			this.fireEvent ('selected', record);
 		        			this.close();
 		                },
 		                scope: this
@@ -70,9 +63,7 @@
                 		var record = this.grid.getSelectionModel().getSelected();
                 		
                 		if(record != null){
-                			this.valueField.setValue(record.data.id);
-		        			this.displayField.setValue(record.data.value);
-                			this.fireEvent ('selected');
+                			this.fireEvent ('selected', record);
                     		this.close();
                 		}else{
                 			Ext.MessageBox.alert('Alert', 'Please select a row.');

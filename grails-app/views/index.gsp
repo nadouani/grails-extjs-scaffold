@@ -11,15 +11,18 @@
     <script type="text/javascript" src="${resource(dir:'js/extjs/ux',file:'Spinner.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/ux',file:'SpinnerField.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/ux',file:'Ext.ux.Toast.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'js/extjs/ux',file:'RowEditor.js')}"></script>
 
 	<!-- Plugin libs -->
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'EntityGridPanel.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'EntityCollectionGridPanel.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'EntityFormPanel.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'RowSelectorDialog.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'RowSelectorField.js')}"></script>
     
     <!-- Extensions css -->
     <link rel="stylesheet" href="${resource(dir:'js/extjs/ux/css',file:'Spinner.css')}" />
+    <link rel="stylesheet" href="${resource(dir:'js/extjs/resources/css',file:'RowEditor.css')}" />
     
     <style type="text/css">
     	.x-tree-node div.menu-node{		    
