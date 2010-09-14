@@ -1,5 +1,3 @@
-extjs scaffold grails plugin
-
 Grails ExtJs Scaffold  plugin is a aims to scaffold a ExtJs based UI for Grails applications.
 
 Instead of the ncie and simple HTML UI provided by the default Grails scaffold mechanism, this plugin allows users to generate full Rich Internet Application based on ExtJs Javascript framework
