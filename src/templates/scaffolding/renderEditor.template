@@ -238,7 +238,7 @@
 		sb << "\n\tselectButtonLabel : '<g:message code=\"default.button.select.label\" default=\"Select\" /> ${property.referencedDomainClass.shortName}',"
 		sb << "\n\tfields : ["
 		sb << fields
-		sb << "\n\t]"
+		sb << "\n\t],"
 		sb << "\n\tcols : ["
 		sb << cols
 		sb << "\n\t]"
