@@ -1,10 +1,67 @@
 <html>
 <head>
   	<title>Welcome to Grails</title>
-  	<link rel="stylesheet" href="${resource(dir:'js/extjs/resources/css/',file:'ext-all.css')}" />
+    <style type="text/css">
+    	.x-tree-node div.menu-node{		    
+		    margin-top:1px;
+		    padding-top:5px;
+		    padding-bottom:5px;
+		}
+		
+		#loading-mask{
+	        position:absolute;
+	        left:0;
+	        top:0;
+	        width:100%;
+	        height:100%;
+	        z-index:20000;
+	        background-color:white;
+	    }
+	    #loading{
+	        position:absolute;
+	        left:45%;
+	        top:40%;
+	        padding:2px;
+	        z-index:20001;
+	        height:auto;
+	    }
+	    #loading a {
+	        color:#225588;
+	    }
+	    #loading .loading-indicator{
+	        background:white;
+	        color:#444;
+	        font:bold 13px tahoma,arial,helvetica;
+	        padding:10px;
+	        margin:0;
+	        height:auto;
+	    }
+	    #loading-msg {
+	        font: normal 10px arial,tahoma,sans-serif;
+	    }
+    </style>
+
+</head>
+<body>
+	<div id="loading-mask" style=""></div>
+	<div id="loading">
+	    <div class="loading-indicator">
+	    	<img src="images/extanim32.gif" width="32" height="32" style="margin-right:8px;float:left;vertical-align:top;"/><a href="http://grails.org">Grails</a> & <a href="http://extjs.com">ExtJS</a><br />
+	    	<span id="loading-msg">Loading styles and images...</span>
+	    </div>
+	</div>
+	
+	<link rel="stylesheet" href="${resource(dir:'js/extjs/resources/css/',file:'ext-all.css')}" />
   	<link rel="stylesheet" href="${resource(dir:'css/',file:'layout.css')}" />
+  	
+  	<!-- Extensions css -->
+    <link rel="stylesheet" href="${resource(dir:'js/extjs/ux/css',file:'Spinner.css')}" />
+    <link rel="stylesheet" href="${resource(dir:'js/extjs/resources/css',file:'RowEditor.css')}" />
     
+    <script type="text/javascript">document.getElementById('loading-msg').innerHTML = 'Loading Core API...';</script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/adapter/ext/',file:'ext-base.js')}"></script>
+    
+    <script type="text/javascript">document.getElementById('loading-msg').innerHTML = 'Loading UI Components...';</script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/',file:'ext-all-debug.js')}"></script>
     
     <!-- Extensions -->
@@ -19,20 +76,9 @@
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'EntityFormPanel.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'RowSelectorDialog.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'RowSelectorField.js')}"></script>
-    
-    <!-- Extensions css -->
-    <link rel="stylesheet" href="${resource(dir:'js/extjs/ux/css',file:'Spinner.css')}" />
-    <link rel="stylesheet" href="${resource(dir:'js/extjs/resources/css',file:'RowEditor.css')}" />
-    
-    <style type="text/css">
-    	.x-tree-node div.menu-node{		    
-		    margin-top:1px;
-		    padding-top:5px;
-		    padding-bottom:5px;
-		}
-    </style>
 
-    <script type="text/javascript">
+	<script type="text/javascript">document.getElementById('loading-msg').innerHTML = 'Initializing...';</script>
+	<script type="text/javascript">
     Ext.onReady(function(){
     	
     	Ext.QuickTips.init();
@@ -150,16 +196,28 @@
         
     </script>
     
-    <!-- Import controllers javascript file -->
+	<!-- Import controllers javascript file -->
     <g:each var="c" in="${grailsApplication.controllerClasses}">
 	<script type="text/javascript" src="<g:resource dir="${c.logicalPropertyName}" file="create" />"></script>
 	<script type="text/javascript" src="<g:resource dir="${c.logicalPropertyName}" file="index" />"></script>
     </g:each>
-</head>
-<body>
+
+	<script type="text/javascript">
+    Ext.onReady(function(){
+    	var hideMask = function () {
+            Ext.get('loading').remove();
+            Ext.fly('loading-mask').fadeOut({
+                remove:true
+            });
+        }
+
+        hideMask.defer(250);
+	});
+    </script>
+    
 	<div id="header">
 		<a href="http://extjs.com" style="float:right;margin-right:10px;"><img src="${resource(dir:'images',file:'extjs.gif')}" style="width:83px;height:24px;margin-top:1px;"/></a>
-		<h1>Grails application</h1>
+		<img src="${resource(dir:'images',file:'grails32.png')}" style="float:left;"/><h1>Grails application</h1>
 	</div>
     <div id="center" class="x-hide-display">
     	<h1>Welcome to Grails</h1>
