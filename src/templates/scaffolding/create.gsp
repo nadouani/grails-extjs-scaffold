@@ -8,46 +8,43 @@
 
 (function(){
     
-    Ext.ns('GrailsApp.ext.form');
+    Ext.ns('GrailsApp.ext.dialog');
     
-    var \$cls = GrailsApp.ext.form.${className}Form = function(cfg){
+    var \$cls = GrailsApp.ext.dialog.${className}Dialog = function(cfg){
     	
         \$cls.superclass.constructor.call(this, Ext.apply({
         	urlSave: '<g:resource dir="${domainClass.propertyName}" file="save" />',
 		    urlUpdate: '<g:resource dir="${domainClass.propertyName}" file="update" />',
 		    urlEdit: '<g:resource dir="${domainClass.propertyName}" file="edit" />',
-		    items: [
-				<%  
-		        props.each { p -> 
-		        	cp = domainClass.constrainedProperties[p.name]
-		            display = (cp ? cp.display : true)        
-		            if (display) { 
-		        %>
-		        ${renderEditor(p)}
-		    	<%  }   } %>			    	
-		    	<%
-		    	if (associations.size() > 0){
-		    	%>
-		    	{xtype: 'tabpanel', activeItem:0,height:200,
-			    	items:[
-			    <%associations.each { a ->%>${renderEditor(a)}<%}%>
-			    	]}
-		    	<%}%>					
-			],
+			tabs:[
+		    	{
+		    		xtype: 'panel',
+		    		layout: 'form',
+		    		title: 'Details',
+		    		bodyStyle: 'padding: 5px',
+		    		items:[
+		    			<%  
+				        props.each { p -> 
+				        	cp = domainClass.constrainedProperties[p.name]
+				            display = (cp ? cp.display : true)        
+				            if (display) { 
+				        %>
+				        ${renderEditor(p)}
+				    	<%  }   } %>
+		    		]
+		    	},
+		    	<%if (associations.size() > 0){ associations.each { a ->%>${renderEditor(a)}<%}}%>
+		    ],
 			loadSuccess: this.loadSuccess
         },cfg));
         
     };
 
-    Ext.extend(\$cls, Ext.Grails.ux.EntityFormPanel, { 
+    Ext.extend(\$cls, Ext.Grails.ux.EntityFormDialog, { 
     	loadSuccess: function(form, action){
-    		<%
-			associations.each { a ->
-			%>
-			Ext.getCmp('grid${className}${a.referencedDomainClass.shortName}').store.loadData(action.result.data);
-			<%
-			}
-			%>
+    		<%associations.each { a ->%>
+			this.grid${className}${a.referencedDomainClass.shortName}.store.loadData(action.result.data);
+			<%}%>
     	}
     });
     

@@ -73,6 +73,7 @@
 	<!-- Plugin libs -->
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'EntityGridPanel.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'EntityCollectionGridPanel.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'EntityFormDialog.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'EntityFormPanel.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'RowSelectorDialog.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/extjs/lib',file:'RowSelectorField.js')}"></script>
