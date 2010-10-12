@@ -20,6 +20,7 @@
 		    	{
 		    		xtype: 'panel',
 		    		layout: 'form',
+		    		autoHeight: true,
 		    		title: 'Details',
 		    		bodyStyle: 'padding: 5px',
 		    		items:[
@@ -44,6 +45,7 @@
     	loadSuccess: function(form, action){
     		<%associations.each { a ->%>
 			this.grid${className}${a.referencedDomainClass.shortName}.store.loadData(action.result.data);
+			this.grid${className}${a.referencedDomainClass.shortName}.setEntityId(this.entityId);
 			<%}%>
     	}
     });

@@ -35,7 +35,11 @@ class ${className}Controller {
 		def ${propertyName} = new ${className}(params)
 		if (${propertyName}.save(flush: true)) {
 			def successMsg = "\${message(code: 'default.created.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
-			render(contentType:"application/json", text:"{'success': true, 'successMsg': '\${successMsg}'}")
+			
+			JSON.use("dcmWithToString") {
+				def converter = new JSON(success: true, successMsg:successMsg, data: ${propertyName})
+				render(contentType:"application/json", text:converter.toString())				
+			}
 		}
 		else {
 			def errors = ""			
@@ -62,7 +66,11 @@ class ${className}Controller {
 			${propertyName}.properties = params
 			if (!${propertyName}.hasErrors() && ${propertyName}.save(flush: true)) {
 				def successMsg = "\${message(code: 'default.updated.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
-				render(contentType:"application/json", text:"{'success': true, 'successMsg': '\${successMsg}'}")
+				
+				JSON.use("dcmWithToString") {
+					def converter = new JSON(success: true, successMsg:successMsg, data: ${propertyName})
+					render(contentType:"application/json", text:converter.toString())					
+				}
 			}
 			else {
 				def errors = ""			
@@ -79,17 +87,6 @@ class ${className}Controller {
 			render(contentType:"application/json", text:"{'success': false, 'errorMsg': '\${errorMsg}'}")
 		}
 	}	
-	
-	def show = {
-		def ${propertyName} = ${className}.get(params.id)
-		if (!${propertyName}) {
-			flash.message = "\${message(code: 'default.not.found.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
-			redirect(action: "list")
-		}
-		else {
-			[${propertyName}: ${propertyName}]
-		}
-	}
 	
 	def edit = {
 		def ${propertyName} = ${className}.get(params.id)

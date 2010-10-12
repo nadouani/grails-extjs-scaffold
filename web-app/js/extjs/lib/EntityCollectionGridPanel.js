@@ -6,13 +6,15 @@
     
     Ext.namespace("Ext.Grails.ux");
     
-    var $cls = Ext.Grails.ux.EntityCollectionGridPanel = function(cfg){
+    var $cls = Ext.Grails.ux.EntityCollectionGridPanel = function(cfg){    	    	
     	
+    	this.entityId = 0;
     	this.entity = cfg.entity;
     	this.entityLabel = cfg.entityLabel;
     	
     	// Select dialog
     	this.urlSelect = cfg.urlSelect;
+    	this.urlUpdate = cfg.urlUpdate;
     	this.selectDlgTitle = cfg.selectDlgTitle || 'Select a row';
     	this.selectDlgWidth = cfg.selectDlgWidth || 600;
     	this.selectDlgHeight = cfg.seledDlgHeight || 300;
@@ -30,6 +32,9 @@
     	this.deleteButtonLabel = cfg.deleteButtonLabel;
     	this.selectButtonLabel = cfg.selectButtonLabel;
     	
+    	this.createDialogClass = cfg.createDialogClass;
+    	this.createDialogTitle = cfg.createDialogTitle;
+    	
 		this.store = new Ext.data.JsonStore({
 			autoDestroy: true,
 		    root: this.root,
@@ -37,15 +42,9 @@
 		 	fields: this.fields
 		});
 		
-		this.editor = new Ext.ux.grid.RowEditor({
-	    	saveText: 'Update',
-	    	clicksToEdit :2
-		});
-		this.plugins = [this.editor];
-		
         $cls.superclass.constructor.call(this, Ext.apply({
         	// style
-        	layout: 'fit',
+        	autoHeight: true,        	
         	loadMask: true,
         	border:false,
         	viewConfig: {
@@ -62,11 +61,11 @@
 				singleSelect : true
 			}),
 			
-			columns : this.getColumns(),
+			columns : this.cols,
 	        tbar: [{
 	            text: this.newButtonLabel,
 	            iconCls: 'icon-add',
-	            handler: this.newButtonHandler,
+	            handler: this.openCreateDialog,
 	            scope: this
 	        },{
 	            text: this.deleteButtonLabel,
@@ -85,13 +84,8 @@
     };
 
     Ext.extend($cls, Ext.grid.GridPanel, {
-    	getColumns: function(){
-    		// TODO add the default editor to each row
-    		Ext.each(this.cols, function(c){
-    			c.editor = new Ext.form.TextField({})
-    		}, this);
-    		
-    		return this.cols;
+    	setEntityId: function(entityId){
+    		this.entityId = entityId;
     	},
     	
 		confirmDelete : function(btn, ev) {
@@ -112,6 +106,22 @@
 		        this.store.remove(record);
 	    	}	        
 	    },
+	    
+	    openCreateDialog: function(){
+			var dialog = new this.createDialogClass({
+				title : this.createDialogTitle,				
+				listeners: {
+	        		onSaved: function(dialog, formPanel, data){	
+	        			var record  = new Ext.data.Record();
+	        			record.data = data;			        			
+	        			
+	        			this.store.add(record);
+	        		},
+	        		scope:this
+	        	}
+			});
+			dialog.show();
+		},
 	    
 	    openSelectDialog: function(){	    	
 	    	this.selectDlgStore = new Ext.data.JsonStore({
@@ -134,10 +144,21 @@
 	            height: this.selectDlgHeight,
 	            listeners: {
 		    		selected: function(record){	
-	    				var r = new Ext.data.Record();
-	    				r.data = record.data; 
-	    				
-				        this.store.add(r);
+	    				Ext.Ajax.request({
+    						url: this.urlUpdate,
+    						success: function(response, opts){
+	    						var obj = Ext.decode(response.responseText);
+
+	    						var r = new Ext.data.Record();
+	    						r.data = obj.data;
+	    						this.store.add(r);
+    						},
+    						failure: function(response, opts){
+    							Ext.MessageBox.Alert('Error', response.responseText)
+    						},
+    						params: {id: record.data.id, 'proprietaire.id': this.entityId },
+    						scope: this
+    					});
 		    		},
 		    		scope: this
 		    	}

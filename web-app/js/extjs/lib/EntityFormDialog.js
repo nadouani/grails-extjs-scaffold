@@ -22,20 +22,23 @@
     	this.urlSave = cfg.urlSave;
     	this.urlUpdate = cfg.urlUpdate;
     	this.urlEdit = cfg.urlEdit;
+    	
+    	this.resized = false;
 		
 		$cls.superclass.constructor.call(this, Ext.apply({
 			modal: true,
+			closable: true,
 			width: 700,
-			height:500,	
-			layout: 'fit',
 			border: false,
+			layout: 'fit',
 			items:[
 		       this.formPanel = new Ext.form.FormPanel({
 		    	   flex:1,
 		    	   border: false,
+		    	   autoScroll: true,
 		    	   monitorValid:true,
 		    	   items:[
-		    	          {
+		    	          this.tabPanel = new Ext.TabPanel({
 		    	        	  xtype: 'tabpanel',
 		    	        	  activeTab: 0,	
 		    	        	  anchor:'100% 100%',
@@ -43,7 +46,7 @@
 		    	        	  	border: false,
 		    	          		},
 			    	          items:this.tabs
-		    	          }
+		    	          })
     	           ],
     	           buttons: [{
     		        	text: 'Save', 
@@ -62,6 +65,20 @@
 		}, cfg));
 		
 		this.addEvents('beforeSave', 'onSaved', 'onCancel');
+		
+		this.on({
+			afterlayout: function(){
+				if(!this.resized){
+					var formPanelHeight = this.formPanel.getHeight() + this.formPanel.getFooterToolbar().getHeight();
+					var winHeight = Math.min(500, Math.max(300, formPanelHeight));
+					
+					this.resized = true;
+					this.setHeight(winHeight);
+					this.doLayout();
+				}
+			},
+			scope: this
+		})
 	};
 	
 	Ext.extend($cls, Ext.Window, {
@@ -77,16 +94,28 @@
 					fieldId.setReadOnly(true);
 				}
 						
-				 this.formPanel.load({
+				this.formPanel.load({
 					url:this.urlEdit,
 					waitMsg:'Loading...',
 					params:{'id':this.entityId},
 					success: this.loadSuccess,
 					scope: this
 				});
+	    	}else{
+	    		var fieldId = form.findField('id');
+				if(fieldId){
+					fieldId.hideLabel = true
+					fieldId.hide();
+				}
+				
+	    		Ext.each(this.tabPanel.items.items, function(item, index, all){
+	    			if(index>0){
+	    				item.setDisabled(true);	    				
+	    			}
+	    		}, this);
 	    	}
 		},
-	    
+		
 		save:function() {
 			this.fireEvent('beforeSave', this, this.formPanel);
 			
@@ -124,20 +153,10 @@
 	    
 	    onSuccess:function(form, action) {
 	 		if(action.result.success == true){
-	 			this.fireEvent('onSaved', this, this.formPanel);
+	 			this.fireEvent('onSaved', this, this.formPanel, action.result.data);
 	 			this.close();
 
 	 			Ext.ux.Toast.msg('Success', action.result.successMsg, 3);
-				
-	 			// TODO handle the success action
-	 			/*
-				var tab = this.callerComponent; 
-				var grid = tab.items.itemAt(0);
-				grid.getStore().load();
-				
-				this.destroy();
-				tab.show();
-				*/
 	 		}
 	 	},
 	    
