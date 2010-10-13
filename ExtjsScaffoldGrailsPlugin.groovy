@@ -3,7 +3,7 @@ import grails.converters.JSON
 import org.codehaus.groovy.grails.web.converters.configuration.ConvertersConfigurationHolder
 import org.codehaus.groovy.grails.web.converters.configuration.DefaultConverterConfiguration
 
-class ExtjsScaffoldingGrailsPlugin {
+class ExtjsScaffoldGrailsPlugin {
     // the plugin version
     def version = "0.2-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
