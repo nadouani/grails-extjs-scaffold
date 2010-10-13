@@ -31,7 +31,7 @@ target ('default': "Installs the extjs scaffolding templates") {
     }		
 
     ant.copy(todir: targetDir, overwrite: overwriteTemplates) {
-        fileset(dir: "${extjsScaffoldingPluginDir}/src/templates/scaffolding", includes: "*")
+        fileset(dir: "${extjsScaffoldPluginDir}/src/templates/scaffolding", includes: "*")
     }
 	
 	// Copy the layout css
@@ -44,7 +44,7 @@ target ('default': "Installs the extjs scaffolding templates") {
 	}
 	
 	ant.copy(todir: cssDir, overwrite: overwriteStyles) {
-		fileset(dir: "${extjsScaffoldingPluginDir}/web-app/css", includes: "*")
+		fileset(dir: "${extjsScaffoldPluginDir}/web-app/css", includes: "*")
 	}
 	
 	// Copy the ExtJS library
@@ -56,7 +56,7 @@ target ('default': "Installs the extjs scaffolding templates") {
 		ant.mkdir(dir: jsDir)
 	}
 	ant.copy(todir: jsDir, overwrite: overwriteJS) {
-		fileset(dir: "${extjsScaffoldingPluginDir}/web-app/js/extjs", includes: "**/*")
+		fileset(dir: "${extjsScaffoldPluginDir}/web-app/js/extjs", includes: "**/*")
 	}
 	
 	// Copy the images
@@ -68,12 +68,12 @@ target ('default': "Installs the extjs scaffolding templates") {
 		ant.mkdir(dir: imagesDir)
 	}
 	ant.copy(todir: imagesDir, overwrite: overwriteImages) {
-		fileset(dir: "${extjsScaffoldingPluginDir}/web-app/images", includes: "**/*")
+		fileset(dir: "${extjsScaffoldPluginDir}/web-app/images", includes: "**/*")
 	}
 	
 	// Copy the index page
 	ant.copy(toDir: viewsDir, overwrite: true){
-		fileset(dir: "${extjsScaffoldingPluginDir}/grails-app/views", includes: "index.gsp")
+		fileset(dir: "${extjsScaffoldPluginDir}/grails-app/views", includes: "index.gsp")
 	}
 
     event("StatusUpdate", [ "extjs Templates installed successfully"])

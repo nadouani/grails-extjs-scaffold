@@ -218,7 +218,7 @@
     
 	<div id="header">
 		<a href="http://extjs.com" style="float:right;margin-right:10px;"><img src="${resource(dir:'images',file:'extjs.gif')}" style="width:83px;height:24px;margin-top:1px;"/></a>
-		<img src="${resource(dir:'images',file:'grails32.png')}" style="float:left;"/><h1>Grails application</h1>
+		<img src="${resource(dir:'images',file:'grails32.png')}" style="float:left;"/><h1><g:meta name="app.name"/>&nbsp;(<g:meta name="app.version"/>)</h1>
 	</div>
     <div id="center" class="x-hide-display">
     	<h1>Welcome to Grails</h1>
