@@ -166,4 +166,62 @@
 	 	}
 	});
 	
+	// Redefine the Submit form Action
+	Ext.form.Action.Submit.prototype.run = function() {
+        var o = this.options,
+        method = this.getMethod(),
+        isGet = method == 'GET';
+	    if(o.clientValidation === false || this.form.isValid()){
+	        if (o.submitEmptyText === false) {
+	            var fields = this.form.items,
+	                emptyFields = [];
+	            fields.each(function(f) {
+	                if (f.el.getValue() == f.emptyText) {
+	                    emptyFields.push(f);
+	                    f.el.dom.value = "";
+	                }
+	            });
+	        }
+	        
+	        var params = {};	        
+	        this.form.items.each(function(item) {
+	            if (o.affectedOnly && !item.hasChanged())
+	                return;
+	            var f = item.getName()
+	            var v = item.getValue();
+	            
+	            if (v instanceof Date) {
+	                params[f] = 'struct';
+	                params[f + '_year'] = v.format('Y');
+	                params[f + '_month'] = v.format('m');
+	                params[f + '_day'] = v.format('d');
+	                params[f + '_hour'] = v.format('H');
+	                params[f + '_minute'] = v.format('i');
+	            } else {
+	                params[f] = v;
+	            }
+	        }, this);
+	        
+	        var p = Ext.applyIf(this.form.baseParams || {} ,Ext.applyIf(o.params || {}, params));
+	        
+	        //TODO : handle fileUpload fields (this.form.fileUpload)
+	        Ext.lib.Ajax.request(
+                this.getMethod(),
+                this.getUrl(isGet),
+                this.createCallback(o),
+                Ext.urlEncode(p)
+	        );
+	        
+	        if (o.submitEmptyText === false) {
+	            Ext.each(emptyFields, function(f) {
+	                if (f.applyEmptyText) {
+	                    f.applyEmptyText();
+	                }
+	            });
+	        }
+	    }else if (o.clientValidation !== false){ // client validation failed
+	        this.failureType = Ext.form.Action.CLIENT_INVALID;
+	        this.form.afterAction(this, false);
+	    }
+	}
 })();
