@@ -31,7 +31,7 @@ This plugin is designed and developed by Nabil ADOUANI
 You can join me at :
 
 * email: nabil.adouani@gmail.com
-* blog : [blog][4]
+* blog : [http://www.nabiladouani.fr][4]
 * twitter: nadouani
 
 [1]: http://www.grails.org
