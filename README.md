@@ -6,8 +6,8 @@ Instead of the ncie and simple HTML UI provided by the default Grails scaffold m
 
 # Links
 
-* Grails website : http://www.grails.org
-* ExtJs website : http://www.extjs.com or http://www.sencha.com
+* [Grails website][1]
+* [ExtJs Website] [2] or [Sencha Website][3]
 
 # Start using the plugin
 
@@ -31,5 +31,10 @@ This plugin is designed and developed by Nabil ADOUANI
 You can join me at :
 
 * email: nabil.adouani@gmail.com
-* blog : http://www.nabiladouani.fr
+* blog : [blog][4]
 * twitter: nadouani
+
+[1]: http://www.grails.org
+[2]: http://www.extjs.com
+[3]: http://www.sencha.com
+[4]: http://www.nabiladouani.fr
