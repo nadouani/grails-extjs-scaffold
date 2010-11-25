@@ -15,9 +15,8 @@
     	this.valueProperty = 'value';
     	this.displayProperty = cfg.displayProperty || 'toString';
     	
-    	this.hiddenName = cfg.name;
+    	this.hiddenName = ''_' + cfg.name;
     	this.rootProperty = cfg.name.split(".")[0];
-    	cfg.name = this.rootProperty + '.' + this.displayProperty;
     	
     	if(cfg.store){
     		this.store = cfg.store;

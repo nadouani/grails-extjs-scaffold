@@ -27,8 +27,7 @@ That's all, now you can create your domain classes and use dynamic or static sca
 
 # About the Author
 
-This plugin is designed and developed by Nabil ADOUANI
-You can join me at :
+This plugin is designed and developed by Nabil ADOUANI. You can join me at :
 
 * email: nabil.adouani@gmail.com
 * blog : [http://www.nabiladouani.fr][4]
