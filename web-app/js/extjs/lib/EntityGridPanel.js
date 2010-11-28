@@ -78,7 +78,11 @@
 
         	// structure
         	selModel : new Ext.grid.RowSelectionModel( {
-				singleSelect : true
+				singleSelect : true,
+				listeners: {
+        			selectionchange: this.rowSelectionChanged,
+        			scope: this
+        		}
 			}),
 	        
 	        bbar: this.getBottomBar(this.store),
@@ -125,14 +129,28 @@
 	            handler: this.newButtonHandler,
 	            scope: this
 	        },{
+	        	ref: '../editButton',
 	            text: this.editButtonLabel,
-	            iconCls: 'icon-edit'
+	            iconCls: 'icon-edit',
+            	disabled: true
 	        },{
+	        	ref: '../removeButton',
 	            text: this.deleteButtonLabel,
 	            iconCls: 'icon-delete',
+	            disabled: true,
 	            handler: this.confirmDelete,
             	scope: this
 	        }];
+		},
+		
+		rowSelectionChanged: function(sm){
+			if(sm.getCount()){
+				this.removeButton.enable();
+				this.editButton.enable();
+			}else{
+				this.removeButton.disable();
+				this.editButton.disable();
+			}
 		},
 		
 		confirmDelete : function(btn, ev) {
