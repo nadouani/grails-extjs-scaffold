@@ -11,11 +11,11 @@
     	this.form = cfg.form;
     	this.dialogTitle = cfg.dialogTitle;
     	
-    	this.idProperty = 'id';    	
-    	this.valueProperty = 'value';
+    	this.idProperty = cfg.idProperty || 'id';    	
+    	this.valueProperty = cfg.valueProperty || 'value';
     	this.displayProperty = cfg.displayProperty || 'toString';
     	
-    	this.hiddenName = '_' + cfg.name;
+    	this.hiddenName = '_' + cfg.name + '.' + this.idProperty;
     	this.rootProperty = cfg.name.split(".")[0];
     	
     	if(cfg.store){
@@ -43,36 +43,18 @@
 		    editable: false
         },cfg));
         
-        //this.addEvents('selected');
-        
         this.on('specialkey', function(f, e){
             if(e.getKey() == e.ENTER){
                 this.onTrigger2Click();
             }
         }, this); 
-        
-        
-        //TODO fix the problem of the this.form reference
-        /*
-        this.form.on({
-        	actioncomplete : function(form, action){
-        		if(action.type == 'load'){
-        			var idValue = action.result.data[this.rootProperty][this.idProperty];
-        			var displayValue = action.result.data[this.rootProperty][[this.displayProperty]];
-        			
-        			this.setValues(idValue, displayValue);
-        		}
-        	},
-        	scope: this
-        });
-        */
     };
 
     Ext.extend($cls, Ext.form.TwinTriggerField, { 
     	// private
         onRender : function(ct, position){
     		Ext.Grails.ux.RowSelectorField.superclass.onRender.call(this, ct, position);
-
+    		
     		this.wrap = this.el.parent('.x-form-field-wrap');
 
             this.hiddenField = new Ext.form.Hidden({
@@ -87,7 +69,6 @@
         
     	// Clear button
     	onTrigger1Click : function(){
-            //this.el.dom.value = '';
         	this.setValues('', '');
             this.triggers[0].hide();
 	    },
@@ -112,6 +93,15 @@
 	    
 	    getValue: function(){
 	    	return this.hiddenField.getValue();
+	    },
+	    
+	    setValue: function(value){
+	    	if(Ext.isObject(value)){
+	    		this.setValues (value[this.idProperty], value[this.displayProperty]);
+	    		this.el.dom.name = this.name + '.' + this.idProperty;
+	    	}else{
+	    		Ext.Grails.ux.RowSelectorField.superclass.setValue.call(this, value);
+	    	}
 	    },
 	    
 	    setValues: function(idValue, displayValue){

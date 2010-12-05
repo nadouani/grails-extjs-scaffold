@@ -81,7 +81,7 @@
 	        var editDialog = new GrailsApp.ext.dialog.${className}Dialog({
 	        	title : '<g:message code="default.button.edit.label" default="Edit" /> ${className}',
 	        	closable: true,
-	        	modale: true,
+	        	modal: true,
 	        	actionName : 'edit',
 	        	entityId: record.data.id,
 	        	listeners: {
