@@ -59,9 +59,20 @@
 		    proxy: this.proxy,
 		    reader: this.reader,
 		    writer: this.writer, 
-		    autoSave: true 
+		    autoSave: true,
+		    batch: true
 		});
-    	
+		
+		this.sm = new Ext.grid.CheckboxSelectionModel({
+			single: false,
+			listeners: {
+				selectionchange: this.rowSelectionChanged,
+				scope: this
+			}
+		});
+		
+		this.cols = cfg.cols;
+		
         $cls.superclass.constructor.call(this, Ext.apply({
         	// style
         	layout: 'anchor',
@@ -77,32 +88,12 @@
         	store: this.store,
 
         	// structure
-        	selModel : new Ext.grid.RowSelectionModel( {
-				singleSelect : true,
-				listeners: {
-        			selectionchange: this.rowSelectionChanged,
-        			scope: this
-        		}
-			}),
-	        
+			columns: this.getColumns(),
 	        bbar: this.getBottomBar(this.store),
 	        tbar: this.getToolbar()
         },cfg));
         
         this.on('rowdblclick', this.rowDblClickHandler);
-		
-        /*
-		Ext.data.DataProxy.addListener('write', function(proxy, action, result, res, rs) {
-			Ext.ux.Toast.msg('Success', res.message, 3);
-		});
-				
-		Ext.data.DataProxy.addListener('exception', function(proxy, type, action, options, res) {
-		    if (type === 'remote') {
-		        Ext.ux.Toast.msg('Remote error', res.message, 5);
-		    }
-		});
-		*/
-        
     };
 
     Ext.extend($cls, Ext.grid.GridPanel, {
@@ -110,6 +101,18 @@
     	onRender:function() {
     		Ext.Grails.ux.EntityGridPanel.superclass.onRender.apply(this, arguments);
 			this.store.load({params:{start:0, limit:10}});
+		},
+		
+		getColumns: function(){
+			var cols = [];
+			
+			cols.push(this.sm);
+			
+			Ext.each(this.cols, function(c){
+				cols.push(c);
+			}, this);
+
+			return cols;
 		},
 	
     	getBottomBar: function(store){
@@ -144,9 +147,14 @@
 		},
 		
 		rowSelectionChanged: function(sm){
-			if(sm.getCount()){
+			var count = sm.getCount(); 
+			if(count>0){
 				this.removeButton.enable();
-				this.editButton.enable();
+				
+				if(count == 1)
+					this.editButton.enable();
+				else
+					this.editButton.disable();
 			}else{
 				this.removeButton.disable();
 				this.editButton.disable();
@@ -164,11 +172,15 @@
 	    
 	    doDelete: function(btn){		
 	    	if(btn == 'yes'){
-	    		var record = this.getSelectionModel().getSelected();
-		        if (!record) {
-		            return false;
+	    		this.store.autoSave = false;	    		
+	    		
+	    		var records = this.getSelectionModel().getSelections();
+		        if (records || records.length > 0) {
+			        this.store.remove(records);
+			        this.store.save();
 		        }        
-		        this.store.remove(record);
+
+		        this.store.autoSave = true;
 	    	}	        
 	    }
     });

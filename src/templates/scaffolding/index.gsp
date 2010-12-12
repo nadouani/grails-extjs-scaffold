@@ -32,7 +32,7 @@
 		    urlDestroy: '<g:resource dir="${entityName}" file="delete" />',
 		
 		    // structure properies
-		    columns:[
+		    cols:[
 		       	<%  
 		        props.each { p -> 
 		        	cp = domainClass.constrainedProperties[p.name]

@@ -47,7 +47,7 @@
             if(e.getKey() == e.ENTER){
                 this.onTrigger2Click();
             }
-        }, this); 
+        }, this);
     };
 
     Ext.extend($cls, Ext.form.TwinTriggerField, { 
@@ -65,6 +65,9 @@
                 cls: 'x-form-hidden x-form-field',
             });
             
+            if(this.form.actionName === 'create'){
+            	this.el.dom.name = this.name + '.' + this.idProperty;
+    		}
         },
         
     	// Clear button

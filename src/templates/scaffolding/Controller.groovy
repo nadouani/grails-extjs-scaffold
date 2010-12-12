@@ -102,9 +102,14 @@ class ${className}Controller {
 	}
 	
 	def delete = {
-		def ${propertyName} = ${className}.get(params.data)
-		if (${propertyName}) {
+		if (params.data) {
 			try {
+				def ids = params.data.replace('[', '').replace(']','').split(',').collect{id -> Long.valueOf(id)}
+				
+				def c = ${className}.createCriteria().list {
+					'in'("id", ids)
+				}*.delete()
+				
 				${propertyName}.delete(flush: true)
 				def successMsg = "\${message(code: 'default.deleted.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.data])}"
 				render(contentType:"application/json", text:"{'success': true, 'message': '\${successMsg}'}")
